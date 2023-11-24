@@ -42,7 +42,7 @@ const createLoginDetails = async (req,res) => {
         console.log("data update ",loginDetails)
         let loginId = loginDetails.loginId;
         const loginData= await LoginDetails.findOneAndUpdate({ loginId:loginId }, loginDetails, {
-            new: true, // Return the modified document rather than the original
+            new: true, 
           }); 
         return loginData;        
     } catch (error) {

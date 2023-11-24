@@ -1,6 +1,6 @@
 const {verifyJwt} = require('../utils/jwtUtils')
-const {successResponse,failureResponse} = require('../utils/apiResponse')
-const {failureMessage,successMessage }= require("../utils/appMessage")
+const {failureResponse} = require('../utils/apiResponse')
+const {failureMessage }= require("../utils/appMessage")
 const {getLoginDetails} = require("../service/loginDetailsService")
 
 
@@ -19,12 +19,9 @@ const authenticateJWT = async (req, res, next) => {
  
  req.user = tokenData.decoded;
 
- console.log("+-+-+- ",req.user)
 
 let loginData = await getLoginDetails(tokenData.decoded.loginId,req,res);
 
-
-console.log("+-+-+- ",loginData)
 
 if(!loginData){
     return res.status(401).json(failureResponse(null,failureMessage.tokenError));
