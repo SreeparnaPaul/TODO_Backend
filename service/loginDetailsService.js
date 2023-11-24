@@ -1,4 +1,4 @@
-const { generateRandomCode } = require("../utils/randomString");
+const { generateRandomCode } = require("../utils/common");
 const LoginDetails = require("../models/loginModel");
 const {failureResponse} = require("../utils/apiResponse")
 const {failureMessage} =require("../utils/appMessage")

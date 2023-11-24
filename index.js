@@ -3,6 +3,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const dbConnection = require("./database/dbConnection");
 const userRouter = require("./routes/userRoutes");
+const taskRouter= require("./routes/taskRoutes")
 const app = express();
 
 require("dotenv").config();
@@ -19,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use("/user", userRouter);
+app.use("/task",taskRouter)
 
 // Start the server
 const PORT = process.env.PORT || 8080;

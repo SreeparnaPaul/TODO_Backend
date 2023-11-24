@@ -10,7 +10,11 @@ function generateRandomCode(length) {
   
     return code;
   }
+  function isValidObjectId(id) {
+    const mongoose = require('mongoose');
+    return mongoose.Types.ObjectId.isValid(id);
+  }
   
   module.exports = {
-    generateRandomCode,
+    generateRandomCode,isValidObjectId
   };
