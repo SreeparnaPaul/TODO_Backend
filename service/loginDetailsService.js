@@ -36,6 +36,7 @@ const createLoginDetails = async (req,res) => {
         }
   }
 
+  
 
   const updateLoginDetails = async (loginDetails,req,res)=>{
     try {
@@ -48,6 +49,25 @@ const createLoginDetails = async (req,res) => {
     } catch (error) {
         return null;
     }
+    
 }
 
-module.exports={createLoginDetails,updateLoginDetails,getLoginDetails}
+
+
+const updateAllLoginDetails = async (email)=>{
+  try {
+
+      const filter = { email: email, active: true };
+      const update ={ $set: {  logoutAt: new Date(), active:false }}
+    
+      
+      const result = await LoginDetails.updateMany(filter, update);
+      return result;        
+  } catch (error) {
+    console.log("error ---  ", error)
+      return null;
+  }
+  
+}
+
+module.exports={createLoginDetails,updateLoginDetails,getLoginDetails,updateAllLoginDetails}

@@ -4,7 +4,15 @@ const Schema = mongoose.Schema;
 
 const taskSchema = new Schema(
   {
+    taskId: {
+      type: String,
+      required: true,
+    },
     title: {
+      type: String,
+      required: true,
+    },
+    description: {
       type: String,
       required: true,
     },

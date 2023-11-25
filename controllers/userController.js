@@ -3,7 +3,7 @@ const { signJwt } = require("../utils/jwtUtils");
 const loginRequestValidate = require("../validations/loginRequestValidation");
 const { failureResponse, successResponse } = require("../utils/apiResponse");
 const { failureMessage, successMessage } = require("../utils/appMessage");
-const {createLoginDetails,updateLoginDetails,getLoginDetails} = require("../service/loginDetailsService")
+const {createLoginDetails,updateLoginDetails,getLoginDetails,updateAllLoginDetails} = require("../service/loginDetailsService")
 
 
 const login = async (req, res) => {
@@ -67,4 +67,20 @@ const login = async (req, res) => {
   
   };
 
-  module.exports={login,logout}
+
+  const logoutFromAllDevices = async (req, res) => {
+
+    const userData = req.user;
+  
+    const updatedData = await updateAllLoginDetails(userData.email);
+    if(updatedData){
+      res.status(200).json(successResponse(null,successMessage.logout));
+    }else{
+      res
+      .status(500)
+      .json(failureResponse(null,failureMessage.internalServer));
+    }
+    
+    };
+
+  module.exports={login,logout,logoutFromAllDevices}

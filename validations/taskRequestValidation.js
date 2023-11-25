@@ -9,6 +9,10 @@ const taskSchemaValidation = Joi.object({
     'string.empty': 'Status is required',
     'any.required': 'Status is required',
   }),
+  description: Joi.string().required().messages({
+    'string.empty': 'Description is required',
+    'any.required': 'Description is required',
+  }),
 });
 
 const taskRequestValidate = (request) => {

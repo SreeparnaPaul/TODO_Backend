@@ -2,13 +2,14 @@ const Task=require("../models/taskModel")
 const { taskRequestValidate } = require("../validations/taskRequestValidation")
 const { failureResponse, successResponse } = require("../utils/apiResponse");
 const { failureMessage, successMessage } = require("../utils/appMessage");
-const {isValidObjectId} =require("../utils/common")
+const {isValidObjectId, generateRandomCode} =require("../utils/common")
 const User=require("../models/userModel")
+
 
 const addTask=async(req,res)=>{
 try {
    
-    const {title,status} =req.body
+    const {title,status,description} =req.body
     const email=req.user.email
     const userDetails= await User.findOne({email})
     let validateResponse =   taskRequestValidate(req.body)
@@ -16,8 +17,10 @@ try {
     if(validateResponse.error){
         return res.status(400).json(failureResponse(validateResponse.error.details,failureMessage.badRequest))
     }
+
+   let taskId =  generateRandomCode(10);
     
-    const taskData = {title,createdBy:userDetails._id,status}
+    const taskData = {taskId,title,description,createdBy:userDetails._id,status}
 
     const taskDetails = new Task(taskData);
     const result= await taskDetails.save();
@@ -33,15 +36,53 @@ try {
 
 const updateTask= async(req,res)=>{
     try {
-    const taskId = req.query.taskId;
-  
-      if (!isValidObjectId(taskId)) {
-        return res.status(400).json(failureResponse(null,failureMessage.badRequest));
+    
+
+    const {taskId,title,status,description} =req.body
+
+
+    if (!taskId || taskId === "") {
+      return res.status(400).json(failureResponse(null,failureMessage.badRequest));
+    }
+
+      let updatedData = {}
+
+      let  query = {taskId};
+
+
+      if(title && title!==""){
+        updatedData.title = title
       }
-   
+
+      if(status && status!==""){
+        updatedData.status = status
+        if(status === "complete"){
+          query.status="pending"
+        }
+      }
+
+      if(description && description!==""){
+        updatedData.description = description
+      }
+  
+      
+
+      const updatedTask = await Task.findOneAndUpdate(query,updatedData,{ new: true });
+
+      
+
+      if(!updateTask){
+        res.status(404).json(failureResponse(null,failureMessage.invalidTask));
+        return;
+      }
+     
+
+      res.status(200).json(successResponse(updatedTask,successMessage.updated));
   
     } catch (error) {
-        
+      res
+      .status(500)
+      .json(failureResponse(error,failureMessage.internalServer));
     }
 }
 
@@ -49,14 +90,15 @@ const deleteTask = async (req, res) => {
     try {
       const taskId = req.query.taskId;
   
-      if (!isValidObjectId(taskId)) {
+      if (!taskId || taskId === "") {
         return res.status(400).json(failureResponse(null,failureMessage.badRequest));
       }
   
-      const deletedTask = await Task.findByIdAndDelete(taskId);
+      const deletedTask = await Task.findOneAndDelete({taskId});
   
       if (!deletedTask) {
-        return res.status(404).json(failureResponse(deletedTask,failureMessage.invalidTask));
+         res.status(404).json(failureResponse(deletedTask,failureMessage.invalidTask));
+          return;
       }
   
       res.status(200).json(successResponse(deletedTask,successMessage.deleted));
@@ -81,18 +123,25 @@ const deleteTask = async (req, res) => {
   
       if (taskId) {
         if (!isValidObjectId(taskId)) {
-          return res.status(400).json(failureResponse(null, failureMessage.badRequest));
+           res.status(400).json(failureResponse(null, failureMessage.badRequest));
+           return
         }
   
-        const selectedTask = await Task.findOne({ _id: taskId, createdBy: userId });
+        const selectedTask = await Task.findOne({ taskId, createdBy: userId });
   
         if (!selectedTask) {
-          return res.status(404).json(failureResponse(null, failureMessage.invalidTask));
+           res.status(404).json(failureResponse(null, failureMessage.invalidTask));
+           return;
         }
   
         res.status(200).json(successResponse(selectedTask, successMessage.singleTask));
       } else {
-        const allTasks = await Task.find({ createdBy: userId });
+
+        const page = parseInt(req.query.page) || 1; 
+        const limit = parseInt(req.query.limit) || 10; 
+        const skip = (page - 1) * limit;
+
+        const allTasks = await Task.find({ createdBy: userId }).skip(skip).limit(limit);
   
         res.status(200).json(successResponse(allTasks, successMessage.allTask));
       }
