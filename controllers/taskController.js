@@ -141,9 +141,13 @@ const deleteTask = async (req, res) => {
         const limit = parseInt(req.query.limit) || 10; 
         const skip = (page - 1) * limit;
 
-        const allTasks = await Task.find({ createdBy: userId }).skip(skip).limit(limit);
+        const allTasksWithPagination = await Task.find({ createdBy: userId }).skip(skip).limit(limit);
+
+        const allTasks = await Task.find({ createdBy: userId });
+
+        const result = {total:allTasks.length , taskList:allTasksWithPagination}
   
-        res.status(200).json(successResponse(allTasks, successMessage.allTask));
+        res.status(200).json(successResponse(result, successMessage.allTask));
       }
     } catch (error) {
       console.error(error);
