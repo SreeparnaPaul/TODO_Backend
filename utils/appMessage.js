@@ -12,7 +12,9 @@ const successMessage = {
     logout:"Logged out successfully",
     created:"Task created successfully",
     updated:"Task updated successfully",
-    deleted:"Task deleted successfully"
+    deleted:"Task deleted successfully",
+    singleTask:"Get selected task successfully",
+    allTask:"Get All Tasks successfully"
 }
 
 module.exports={successMessage,failureMessage}
